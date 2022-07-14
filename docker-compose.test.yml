@@ -1,0 +1,43 @@
+version: '3.4'
+services:
+    app:
+        container_name: 'test-project-hernan'
+        image: 'test-project-hernan'
+        build:
+            context: .
+            dockerfile: Dockerfile.multi-stage
+            target: testing
+        environment:
+            APP_ENV: 'testing'
+            ENVIRONMENT_NAME: ${ENVIRONMENT_NAME}
+            EVENT_LOGGER_PASSWORD: ${EVENT_LOGGER_PASSWORD}
+            EVENT_LOGGER_URL: ${EVENT_LOGGER_URL}
+            EVENT_LOGGER_USER: ${EVENT_LOGGER_USER}
+            TEST_PROJECT_HERNAN_POSTGRESQL_HOST: test-project-hernan-postgres
+            TEST_PROJECT_HERNAN_POSTGRESQL_NAME: db
+            TEST_PROJECT_HERNAN_POSTGRESQL_NAME_TEST: db_test
+            TEST_PROJECT_HERNAN_POSTGRESQL_PASSWORD: ${TEST_PROJECT_HERNAN_POSTGRESQL_PASSWORD}
+            TEST_PROJECT_HERNAN_POSTGRESQL_PORT: 5432
+            TEST_PROJECT_HERNAN_POSTGRESQL_SSLMODE: disable
+            TEST_PROJECT_HERNAN_POSTGRESQL_USERNAME: user
+            TEST_PROJECT_HERNAN_REST_PORT: 9009
+            SECONDS_BETWEEN_ATTEMPTS: 10
+            SERVICE_NAME: test-project-hernan
+            WHITE_LIST: 'http://localhost:9000'
+        ports:
+            - '9009:9009'
+        depends_on:
+            - database
+    database:
+        container_name: 'test-project-hernan-postgres'
+        image: 'postgres:12.3'
+        environment:
+            POSTGRES_DB: db_test
+            POSTGRES_PASSWORD: ${TEST_PROJECT_HERNAN_POSTGRESQL_PASSWORD}
+            POSTGRES_USER: user
+        ports:
+            - '7090:5432'
+networks:
+    default:
+        external:
+            name: herno-net
